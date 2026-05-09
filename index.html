@@ -1020,7 +1020,7 @@ function downloadCard() {
   const r = results[key] || results['IPT'];
 
   const canvas = document.createElement('canvas');
-  const W = 560, H = 760;
+  const W = 600, H = 800;
   canvas.width = W;
   canvas.height = H;
   const ctx = canvas.getContext('2d');
@@ -1029,93 +1029,117 @@ function downloadCard() {
   ctx.fillStyle = '#FDF6F0';
   ctx.fillRect(0, 0, W, H);
 
-  // 圓形紅色背景在貓咪後面
-  ctx.beginPath();
-  ctx.arc(W/2, 200, 140, 0, Math.PI * 2);
-  ctx.fillStyle = 'rgba(232, 82, 74, 0.12)';
-  ctx.fill();
-
-  ctx.beginPath();
-  ctx.arc(W/2, 200, 110, 0, Math.PI * 2);
-  ctx.fillStyle = 'rgba(232, 82, 74, 0.15)';
-  ctx.fill();
-
   // emoji
-  ctx.font = '110px serif';
+  ctx.font = '100px serif';
   ctx.textAlign = 'center';
-  ctx.fillText(r.emoji, W/2, 240);
+  ctx.fillText(r.emoji, W/2, 130);
 
   // 你是
-  ctx.font = '400 20px sans-serif';
-  ctx.fillStyle = '#8B6355';
-  ctx.fillText('你是', W/2, 310);
+  ctx.font = '400 18px sans-serif';
+  ctx.fillStyle = '#B09080';
+  ctx.fillText('你是', W/2, 170);
 
   // 名稱
-  ctx.font = '900 52px sans-serif';
+  ctx.font = '900 54px sans-serif';
   ctx.fillStyle = '#5C3D2E';
-  ctx.fillText(r.name, W/2, 375);
+  ctx.fillText(r.name, W/2, 232);
 
   // 品種
-  ctx.font = '400 24px sans-serif';
-  ctx.fillStyle = '#8B6355';
-  ctx.fillText(r.breed, W/2, 412);
-
-  // 分隔點
-  ctx.fillStyle = '#F5C5A3';
-  ctx.beginPath();
-  ctx.arc(W/2, 440, 3, 0, Math.PI * 2);
-  ctx.fill();
+  ctx.font = '400 22px sans-serif';
+  ctx.fillStyle = '#B09080';
+  ctx.fillText(r.breed, W/2, 265);
 
   // 標籤
-  const tags = r.tags;
-  ctx.font = '700 20px sans-serif';
-  const tagPad = 16;
-  const tagH = 36;
-  const tagGap = 8;
-  const tagWidths = tags.map(t => ctx.measureText(t).width + tagPad * 2);
-  let totalW = tagWidths.reduce((a,b) => a+b, 0) + (tags.length-1) * tagGap;
-
-  // 兩排處理
-  const row1 = tags.slice(0, 2);
-  const row2 = tags.slice(2);
-  const w1 = tagWidths.slice(0, 2).reduce((a,b)=>a+b,0) + tagGap;
+  ctx.font = '700 18px sans-serif';
+  const tagPad = 14;
+  const tagH = 32;
+  const tagGap = 6;
+  const tagWidths = r.tags.map(t => ctx.measureText(t).width + tagPad * 2);
+  const row1 = r.tags.slice(0, 2);
+  const row2 = r.tags.slice(2);
+  const w1 = tagWidths.slice(0,2).reduce((a,b)=>a+b,0) + tagGap;
   const w2 = tagWidths.slice(2).reduce((a,b)=>a+b,0) + tagGap;
 
-  [[row1, w1, 465], [row2, w2, 510]].forEach(([rowTags, rowW, rowY]) => {
+  [[row1, w1, 300], [row2, w2, 340]].forEach(([rowTags, rowW, rowY]) => {
     let sx = (W - rowW) / 2;
     rowTags.forEach((tag, i) => {
-      const globalI = i + (rowTags === row2 ? 2 : 0);
-      const tw = tagWidths[globalI];
-      ctx.fillStyle = globalI % 2 === 0 ? '#FDECEA' : '#EDF6FB';
-      roundRect(ctx, sx, rowY - tagH + 6, tw, tagH, 18);
+      const gi = i + (rowTags === row2 ? 2 : 0);
+      const tw = tagWidths[gi];
+      ctx.fillStyle = gi % 2 === 0 ? '#FDECEA' : '#EDF6FB';
+      roundRect(ctx, sx, rowY - tagH + 6, tw, tagH, 16);
       ctx.fill();
-      ctx.fillStyle = globalI % 2 === 0 ? '#E8524A' : '#6BB8D4';
+      ctx.fillStyle = gi % 2 === 0 ? '#E8524A' : '#6BB8D4';
       ctx.textAlign = 'left';
       ctx.fillText(tag, sx + tagPad, rowY + 2);
       sx += tw + tagGap;
     });
   });
 
-  // 描述第一句
+  // 引號框
+  const boxX = 48, boxY = 380, boxW = W - 96, boxH = 160;
+  ctx.strokeStyle = '#EDE0D4';
+  ctx.lineWidth = 1.5;
+  roundRect(ctx, boxX, boxY, boxW, boxH, 16);
+  ctx.stroke();
+
+  // 引號裝飾
+  ctx.font = '800 48px serif';
+  ctx.fillStyle = '#E8524A';
+  ctx.textAlign = 'left';
+  ctx.globalAlpha = 0.25;
+  ctx.fillText('\u201C', boxX + 14, boxY + 44);
+  ctx.textAlign = 'right';
+  ctx.fillText('\u201D', boxX + boxW - 14, boxY + boxH - 4);
+  ctx.globalAlpha = 1;
+
+  // 菱形裝飾線
+  const midX = W / 2;
+  const lineY = boxY + 22;
+  ctx.strokeStyle = '#EDE0D4';
+  ctx.lineWidth = 1;
+  ctx.beginPath();
+  ctx.moveTo(boxX + 48, lineY);
+  ctx.lineTo(midX - 10, lineY);
+  ctx.stroke();
+  ctx.beginPath();
+  ctx.moveTo(midX + 10, lineY);
+  ctx.lineTo(boxX + boxW - 48, lineY);
+  ctx.stroke();
+  // 菱形
+  ctx.strokeStyle = '#E8524A';
+  ctx.globalAlpha = 0.4;
+  ctx.beginPath();
+  ctx.moveTo(midX, lineY - 6);
+  ctx.lineTo(midX + 7, lineY);
+  ctx.lineTo(midX, lineY + 6);
+  ctx.lineTo(midX - 7, lineY);
+  ctx.closePath();
+  ctx.stroke();
+  ctx.globalAlpha = 1;
+
+  // 引號內文字
   ctx.font = '400 21px sans-serif';
   ctx.fillStyle = '#5C3D2E';
   ctx.textAlign = 'center';
   const firstLine = r.desc.split('\n\n')[0];
-  wrapText(ctx, firstLine, W/2, 575, W - 80, 34);
+  wrapText(ctx, firstLine, W/2, boxY + 65, boxW - 60, 34);
 
-  // 細線
+  // 底部細線 + 貓掌 + 網址
+  const footY = 600;
   ctx.strokeStyle = '#EDE0D4';
   ctx.lineWidth = 1;
   ctx.beginPath();
-  ctx.moveTo(60, 690);
-  ctx.lineTo(W - 60, 690);
+  ctx.moveTo(boxX, footY);
+  ctx.lineTo(boxX + boxW, footY);
   ctx.stroke();
 
-  // 網址
-  ctx.font = '400 19px sans-serif';
-  ctx.fillStyle = '#B09080';
+  ctx.font = '22px serif';
   ctx.textAlign = 'center';
-  ctx.fillText('cat-mauve-eight.vercel.app', W/2, 728);
+  ctx.fillText('🐾', W/2, footY + 36);
+
+  ctx.font = '400 18px sans-serif';
+  ctx.fillStyle = '#B09080';
+  ctx.fillText('cat-mauve-eight.vercel.app', W/2, footY + 66);
 
   const link = document.createElement('a');
   link.download = `喵咪TI_${r.name}.png`;
