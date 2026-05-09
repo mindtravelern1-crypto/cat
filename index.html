@@ -568,6 +568,21 @@
     line-height: 1.7;
   }
 
+  .btn-download {
+    width: 100%;
+    background: white;
+    border: 2px solid var(--coral);
+    color: var(--coral);
+    padding: 15px;
+    border-radius: 50px;
+    font-size: 15px;
+    font-weight: 700;
+    font-family: 'Noto Sans TC', sans-serif;
+    cursor: pointer;
+    transition: all 0.2s;
+    margin-bottom: 12px;
+  }
+
   .btn-share {
     width: 100%;
     background: var(--coral);
@@ -990,12 +1005,147 @@ function showResult() {
             <button class="btn-coupon-copy" onclick="copyAndGo()">複製優惠碼並前往官網 →</button>
           </div>
         </div>
+        <button class="btn-download" onclick="downloadCard()">下載結果圖片 ↓</button>
         <button class="btn-share" onclick="shareResult('${r.name}', '${r.breed}')">分享給朋友 🐾</button>
         <br><br>
         <button class="btn-retry" onclick="retryQuiz()">再測一次</button>
       </div>
     </div>
   `;
+}
+
+function downloadCard() {
+  const key = (scores.E >= scores.I ? 'E' : 'I') + (scores.J >= scores.P ? 'J' : 'P') + (scores.A >= scores.T ? 'A' : 'T');
+  const r = results[key] || results['IPT'];
+
+  const canvas = document.createElement('canvas');
+  const W = 800, H = 1000;
+  canvas.width = W;
+  canvas.height = H;
+  const ctx = canvas.getContext('2d');
+
+  // 背景
+  ctx.fillStyle = '#FDF6F0';
+  ctx.fillRect(0, 0, W, H);
+
+  // 頂部紅色區塊
+  ctx.fillStyle = '#E8524A';
+  ctx.beginPath();
+  ctx.rect(0, 0, W, 480);
+  ctx.fill();
+
+  // 底部圓弧
+  ctx.fillStyle = '#FDF6F0';
+  ctx.beginPath();
+  ctx.ellipse(W/2, 480, W/2 + 40, 60, 0, 0, Math.PI);
+  ctx.fill();
+
+  // emoji
+  ctx.font = '120px serif';
+  ctx.textAlign = 'center';
+  ctx.fillText(r.emoji, W/2, 220);
+
+  // 你是
+  ctx.font = '500 28px sans-serif';
+  ctx.fillStyle = 'rgba(255,255,255,0.75)';
+  ctx.fillText('你是', W/2, 290);
+
+  // 名稱
+  ctx.font = '900 64px sans-serif';
+  ctx.fillStyle = '#FFFFFF';
+  ctx.fillText(r.name, W/2, 370);
+
+  // 品種
+  ctx.font = '500 30px sans-serif';
+  ctx.fillStyle = 'rgba(255,255,255,0.8)';
+  ctx.fillText(r.breed, W/2, 415);
+
+  // 標籤
+  const tags = r.tags;
+  const tagY = 560;
+  ctx.font = '700 24px sans-serif';
+  const tagPad = 20;
+  let totalW = 0;
+  const tagWidths = tags.map(t => ctx.measureText(t).width + tagPad * 2);
+  totalW = tagWidths.reduce((a,b) => a+b, 0) + (tags.length-1) * 12;
+  let startX = (W - totalW) / 2;
+
+  tags.forEach((tag, i) => {
+    const tw = tagWidths[i];
+    const tx = startX;
+    // chip背景
+    ctx.fillStyle = i % 2 === 0 ? '#FDECEA' : '#EDF6FB';
+    roundRect(ctx, tx, tagY - 30, tw, 48, 24);
+    ctx.fill();
+    // chip文字
+    ctx.fillStyle = i % 2 === 0 ? '#E8524A' : '#6BB8D4';
+    ctx.textAlign = 'left';
+    ctx.fillText(tag, tx + tagPad, tagY + 6);
+    startX += tw + 12;
+  });
+
+  // 描述第一句
+  ctx.font = '400 26px sans-serif';
+  ctx.fillStyle = '#5C3D2E';
+  ctx.textAlign = 'center';
+  const firstLine = r.desc.split('\n\n')[0];
+  wrapText(ctx, firstLine, W/2, 660, W - 100, 38);
+
+  // 分隔線
+  ctx.strokeStyle = '#F0E8E0';
+  ctx.lineWidth = 2;
+  ctx.beginPath();
+  ctx.moveTo(60, 820);
+  ctx.lineTo(W - 60, 820);
+  ctx.stroke();
+
+  // 網址
+  ctx.font = '500 24px sans-serif';
+  ctx.fillStyle = '#8B6355';
+  ctx.textAlign = 'center';
+  ctx.fillText('cat-mauve-eight.vercel.app', W/2, 880);
+
+  // 貓掌裝飾
+  ctx.font = '30px serif';
+  ctx.fillText('🐾', 100, 900);
+  ctx.fillText('🐾', W - 100, 900);
+
+  // 下載
+  const link = document.createElement('a');
+  link.download = `喵咪TI_${r.name}.png`;
+  link.href = canvas.toDataURL('image/png');
+  link.click();
+}
+
+function roundRect(ctx, x, y, w, h, r) {
+  ctx.beginPath();
+  ctx.moveTo(x + r, y);
+  ctx.lineTo(x + w - r, y);
+  ctx.quadraticCurveTo(x + w, y, x + w, y + r);
+  ctx.lineTo(x + w, y + h - r);
+  ctx.quadraticCurveTo(x + w, y + h, x + w - r, y + h);
+  ctx.lineTo(x + r, y + h);
+  ctx.quadraticCurveTo(x, y + h, x, y + h - r);
+  ctx.lineTo(x, y + r);
+  ctx.quadraticCurveTo(x, y, x + r, y);
+  ctx.closePath();
+}
+
+function wrapText(ctx, text, x, y, maxW, lineH) {
+  const words = text.split('');
+  let line = '';
+  let cy = y;
+  for (let i = 0; i < words.length; i++) {
+    const test = line + words[i];
+    if (ctx.measureText(test).width > maxW && line !== '') {
+      ctx.fillText(line, x, cy);
+      line = words[i];
+      cy += lineH;
+    } else {
+      line = test;
+    }
+  }
+  ctx.fillText(line, x, cy);
 }
 
 function copyAndGo() {
@@ -1030,16 +1180,54 @@ function copyCoupon() {
 function shareResult(name, breed) {
   const text = `我做了喵咪TI測驗，結果是「${name}」（${breed}）🐾\n你是哪種貓？`;
   const url = window.location.href;
+  const full = text + '\n' + url;
 
   if (navigator.share) {
-    navigator.share({ title: '喵咪TI', text, url }).catch(() => {});
+    navigator.share({ title: '喵咪TI', text, url }).catch(() => showShareModal(full));
   } else {
-    navigator.clipboard.writeText(text + '\n' + url).then(() => {
-      alert('已複製到剪貼簿！');
-    }).catch(() => {
-      prompt('複製這段文字分享給朋友：', text + '\n' + url);
-    });
+    showShareModal(full);
   }
+}
+
+function showShareModal(content) {
+  const existing = document.getElementById('shareModal');
+  if (existing) existing.remove();
+
+  const modal = document.createElement('div');
+  modal.id = 'shareModal';
+  modal.style.cssText = `
+    position: fixed; inset: 0; background: rgba(0,0,0,0.5);
+    display: flex; align-items: flex-end; justify-content: center;
+    z-index: 999; padding: 16px;
+  `;
+  modal.innerHTML = `
+    <div style="background:white;border-radius:24px;padding:24px;width:100%;max-width:480px;box-shadow:0 8px 32px rgba(0,0,0,0.2)">
+      <div style="font-size:14px;font-weight:700;color:#5C3D2E;margin-bottom:12px">分享給朋友 🐾</div>
+      <textarea readonly style="width:100%;height:90px;border:1.5px solid #F5C5A3;border-radius:12px;padding:12px;font-size:13px;color:#5C3D2E;font-family:'Noto Sans TC',sans-serif;resize:none;outline:none;background:#FDF6F0">${content}</textarea>
+      <div style="display:flex;gap:10px;margin-top:12px">
+        <button onclick="doCopy(this)" style="flex:1;background:#E8524A;color:white;border:none;padding:13px;border-radius:50px;font-size:14px;font-weight:700;font-family:'Noto Sans TC',sans-serif;cursor:pointer">複製內容</button>
+        <button onclick="document.getElementById('shareModal').remove()" style="flex:1;background:white;color:#8B6355;border:2px solid #F5C5A3;padding:13px;border-radius:50px;font-size:14px;font-weight:700;font-family:'Noto Sans TC',sans-serif;cursor:pointer">關閉</button>
+      </div>
+    </div>
+  `;
+  document.body.appendChild(modal);
+  modal.addEventListener('click', e => { if (e.target === modal) modal.remove(); });
+}
+
+function doCopy(btn) {
+  const ta = btn.closest('div').previousElementSibling;
+  navigator.clipboard.writeText(ta.value).then(() => {
+    btn.textContent = '已複製 ✓';
+    btn.style.background = '#4CAF50';
+    setTimeout(() => {
+      btn.textContent = '複製內容';
+      btn.style.background = '#E8524A';
+    }, 2000);
+  }).catch(() => {
+    ta.select();
+    document.execCommand('copy');
+    btn.textContent = '已複製 ✓';
+  });
 }
 
 function retryQuiz() {
