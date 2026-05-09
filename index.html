@@ -700,14 +700,14 @@ const questions = [
     options: [
       { paw: '🐾', text: '再傳一則「?」，不是在生氣，只是在追進度', value: 'EJ' },
       { paw: '🐾', text: '算了，自己做，反正等他還不如直接完成', value: 'IJ' },
-      { paw: '🐾', text: '盯著那個已讀符號看了很久，決定去睡覺，明天的事明天說', value: 'M_EI' }
+      { paw: '🐾', text: '盯著那個已讀符號看了很久，決定去睡覺，明天的事明天說', value: 'IT' }
     ]
   },
   {
     id: 4,
     text: 'Deadline 是明天 11:59，現在是今天下午兩點，你在幹嘛？',
     options: [
-      { paw: '🐾', text: '已經寫完了，在調字距，這樣比較不焦慮', value: 'J' },
+      { paw: '🐾', text: '已經寫完了，在調字距，這樣比較不焦慮', value: 'JA' },
       { paw: '🐾', text: '剛開新文件，打了標題，去泡了杯咖啡，準備進入高效模式（還沒進入）', value: 'P' },
       { paw: '🐾', text: '開著文件但在滑手機，每隔一段時間看一下字數，假裝這樣就算在趕進度', value: 'M_JP' }
     ]
@@ -872,7 +872,7 @@ function getScoreDelta(value) {
   else if (value === 'PT') { d.P=1; d.T=1; }
   else if (value === 'A') d.A=1;
   else if (value === 'T') d.T=1;
-  else if (value === 'M_AT') { d.A=0.5; d.T=0.5; }
+  else if (value === 'IT') { d.I=1; d.T=1; }
   else if (value === 'M_EI') { d.E=0.5; d.I=0.5; }
   else if (value === 'M_JP') { d.J=0.5; d.P=0.5; }
   else if (value === 'M_PA') { d.P=0.5; d.A=0.5; }
@@ -934,9 +934,9 @@ function goBack() {
 }
 
 function showResult() {
-  const social = scores.E >= scores.I ? 'E' : 'I';
-  const exec   = scores.J >= scores.P ? 'J' : 'P';
-  const vibe   = scores.A >= scores.T ? 'A' : 'T';
+  const social = scores.E > scores.I ? 'E' : scores.I > scores.E ? 'I' : (Math.random() > 0.5 ? 'E' : 'I');
+  const exec   = scores.J > scores.P ? 'J' : scores.P > scores.J ? 'P' : (Math.random() > 0.5 ? 'J' : 'P');
+  const vibe   = scores.A > scores.T ? 'A' : scores.T > scores.A ? 'T' : (Math.random() > 0.5 ? 'A' : 'T');
   const key = social + exec + vibe;
   const r = results[key] || results['IPT'];
 
@@ -1016,136 +1016,126 @@ function showResult() {
 }
 
 function downloadCard() {
-  const key = (scores.E >= scores.I ? 'E' : 'I') + (scores.J >= scores.P ? 'J' : 'P') + (scores.A >= scores.T ? 'A' : 'T');
+  const key = (scores.E > scores.I ? 'E' : 'I') +
+              (scores.J > scores.P ? 'J' : 'P') +
+              (scores.A > scores.T ? 'A' : 'T');
   const r = results[key] || results['IPT'];
-
+  const W = 600;
   const canvas = document.createElement('canvas');
-  const W = 600, H = 800;
-  canvas.width = W;
-  canvas.height = H;
+  canvas.width = W; canvas.height = 900;
   const ctx = canvas.getContext('2d');
 
-  // 背景
   ctx.fillStyle = '#FDF6F0';
-  ctx.fillRect(0, 0, W, H);
+  ctx.fillRect(0, 0, W, 900);
 
-  // emoji
-  ctx.font = '100px serif';
-  ctx.textAlign = 'center';
-  ctx.fillText(r.emoji, W/2, 130);
+  const redH = 280;
+  ctx.fillStyle = '#E8524A';
+  ctx.fillRect(0, 0, W, redH);
 
-  // 你是
-  ctx.font = '400 18px sans-serif';
-  ctx.fillStyle = '#B09080';
-  ctx.fillText('你是', W/2, 170);
+  ctx.font = '86px serif'; ctx.textAlign = 'center';
+  ctx.fillText(r.emoji, W/2, 96);
 
-  // 名稱
-  ctx.font = '900 54px sans-serif';
-  ctx.fillStyle = '#5C3D2E';
-  ctx.fillText(r.name, W/2, 232);
+  ctx.font = '400 17px sans-serif'; ctx.fillStyle = 'rgba(255,255,255,0.75)';
+  ctx.fillText('你是', W/2, 130);
 
-  // 品種
-  ctx.font = '400 22px sans-serif';
-  ctx.fillStyle = '#B09080';
-  ctx.fillText(r.breed, W/2, 265);
+  ctx.font = '900 50px sans-serif'; ctx.fillStyle = '#FFFFFF';
+  ctx.fillText(r.name, W/2, 190);
 
-  // 標籤
-  ctx.font = '700 18px sans-serif';
-  const tagPad = 14;
-  const tagH = 32;
-  const tagGap = 6;
-  const tagWidths = r.tags.map(t => ctx.measureText(t).width + tagPad * 2);
-  const row1 = r.tags.slice(0, 2);
-  const row2 = r.tags.slice(2);
-  const w1 = tagWidths.slice(0,2).reduce((a,b)=>a+b,0) + tagGap;
-  const w2 = tagWidths.slice(2).reduce((a,b)=>a+b,0) + tagGap;
+  ctx.font = '400 20px sans-serif'; ctx.fillStyle = 'rgba(255,255,255,0.8)';
+  ctx.fillText(r.breed, W/2, 224);
 
-  [[row1, w1, 300], [row2, w2, 340]].forEach(([rowTags, rowW, rowY]) => {
-    let sx = (W - rowW) / 2;
-    rowTags.forEach((tag, i) => {
-      const gi = i + (rowTags === row2 ? 2 : 0);
-      const tw = tagWidths[gi];
-      ctx.fillStyle = gi % 2 === 0 ? '#FDECEA' : '#EDF6FB';
-      roundRect(ctx, sx, rowY - tagH + 6, tw, tagH, 16);
-      ctx.fill();
-      ctx.fillStyle = gi % 2 === 0 ? '#E8524A' : '#6BB8D4';
-      ctx.textAlign = 'left';
-      ctx.fillText(tag, sx + tagPad, rowY + 2);
-      sx += tw + tagGap;
-    });
+  ctx.font = '700 15px sans-serif';
+  const bPad = 11, bH = 26, bGap = 7;
+  const bWidths = r.dims.map(d => ctx.measureText(d).width + bPad * 2);
+  const bTotal = bWidths.reduce((a,b)=>a+b,0) + (r.dims.length-1)*bGap;
+  let bx = (W - bTotal) / 2;
+  r.dims.forEach((dim, i) => {
+    const bw = bWidths[i];
+    ctx.fillStyle = 'rgba(255,255,255,0.2)';
+    roundRect(ctx, bx, 246, bw, bH, 13); ctx.fill();
+    ctx.strokeStyle = 'rgba(255,255,255,0.35)'; ctx.lineWidth = 1;
+    roundRect(ctx, bx, 246, bw, bH, 13); ctx.stroke();
+    ctx.fillStyle = 'rgba(255,255,255,0.9)'; ctx.textAlign = 'left';
+    ctx.fillText(dim, bx + bPad, 263);
+    bx += bw + bGap;
   });
 
-  // 引號框
-  const boxX = 48, boxY = 380, boxW = W - 96, boxH = 160;
-  ctx.strokeStyle = '#EDE0D4';
-  ctx.lineWidth = 1.5;
-  roundRect(ctx, boxX, boxY, boxW, boxH, 16);
-  ctx.stroke();
+  ctx.font = '700 16px sans-serif';
+  const tPad = 12, tH = 29, tGap = 6;
+  const tWidths = r.tags.map(t => ctx.measureText(t).width + tPad * 2);
+  const tTotal = tWidths.reduce((a,b)=>a+b,0) + (r.tags.length-1)*tGap;
+  let tx = (W - tTotal) / 2;
+  const tagY = redH + 20;
+  r.tags.forEach((tag, i) => {
+    const tw = tWidths[i];
+    ctx.fillStyle = i % 2 === 0 ? '#FDECEA' : '#EDF6FB';
+    roundRect(ctx, tx, tagY, tw, tH, 14); ctx.fill();
+    ctx.fillStyle = i % 2 === 0 ? '#E8524A' : '#6BB8D4';
+    ctx.textAlign = 'left';
+    ctx.fillText(tag, tx + tPad, tagY + 19);
+    tx += tw + tGap;
+  });
 
-  // 引號裝飾
-  ctx.font = '800 48px serif';
-  ctx.fillStyle = '#E8524A';
-  ctx.textAlign = 'left';
-  ctx.globalAlpha = 0.25;
-  ctx.fillText('\u201C', boxX + 14, boxY + 44);
-  ctx.textAlign = 'right';
-  ctx.fillText('\u201D', boxX + boxW - 14, boxY + boxH - 4);
-  ctx.globalAlpha = 1;
-
-  // 菱形裝飾線
-  const midX = W / 2;
-  const lineY = boxY + 22;
-  ctx.strokeStyle = '#EDE0D4';
-  ctx.lineWidth = 1;
-  ctx.beginPath();
-  ctx.moveTo(boxX + 48, lineY);
-  ctx.lineTo(midX - 10, lineY);
-  ctx.stroke();
-  ctx.beginPath();
-  ctx.moveTo(midX + 10, lineY);
-  ctx.lineTo(boxX + boxW - 48, lineY);
-  ctx.stroke();
-  // 菱形
-  ctx.strokeStyle = '#E8524A';
-  ctx.globalAlpha = 0.4;
-  ctx.beginPath();
-  ctx.moveTo(midX, lineY - 6);
-  ctx.lineTo(midX + 7, lineY);
-  ctx.lineTo(midX, lineY + 6);
-  ctx.lineTo(midX - 7, lineY);
-  ctx.closePath();
-  ctx.stroke();
-  ctx.globalAlpha = 1;
-
-  // 引號內文字
-  ctx.font = '400 21px sans-serif';
-  ctx.fillStyle = '#5C3D2E';
-  ctx.textAlign = 'center';
-  const firstLine = r.desc.split('\n\n')[0];
-  wrapText(ctx, firstLine, W/2, boxY + 65, boxW - 60, 34);
-
-  // 底部細線 + 貓掌 + 網址
-  const footY = 600;
-  ctx.strokeStyle = '#EDE0D4';
-  ctx.lineWidth = 1;
-  ctx.beginPath();
-  ctx.moveTo(boxX, footY);
-  ctx.lineTo(boxX + boxW, footY);
-  ctx.stroke();
-
-  ctx.font = '22px serif';
-  ctx.textAlign = 'center';
-  ctx.fillText('🐾', W/2, footY + 36);
-
+  const boxX = 40, boxY = tagY + tH + 20, boxW = W - 80;
   ctx.font = '400 18px sans-serif';
-  ctx.fillStyle = '#B09080';
-  ctx.fillText('cat-mauve-eight.vercel.app', W/2, footY + 66);
+  const desc = r.desc.split('\n\n')[0];
+  const maxLW = boxW - 56;
+  const lines = [];
+  let line = '';
+  for (const ch of desc) {
+    const test = line + ch;
+    if (ctx.measureText(test).width > maxLW && line !== '') {
+      lines.push(line); line = ch;
+    } else line = test;
+  }
+  lines.push(line);
+  const lH = 30;
+  const boxH = lines.length * lH + 52;
+
+  ctx.strokeStyle = '#EDE0D4'; ctx.lineWidth = 1.5;
+  roundRect(ctx, boxX, boxY, boxW, boxH, 16); ctx.stroke();
+
+  ctx.font = '800 42px serif'; ctx.fillStyle = '#E8524A';
+  ctx.globalAlpha = 0.2; ctx.textAlign = 'left';
+  ctx.fillText('\u201C', boxX + 12, boxY + 38);
+  ctx.textAlign = 'right';
+  ctx.fillText('\u201D', boxX + boxW - 12, boxY + boxH - 4);
+  ctx.globalAlpha = 1;
+
+  const midX = W / 2, dY = boxY + 18;
+  ctx.strokeStyle = '#EDE0D4'; ctx.lineWidth = 1; ctx.globalAlpha = 0.8;
+  ctx.beginPath(); ctx.moveTo(boxX + 40, dY); ctx.lineTo(midX - 8, dY); ctx.stroke();
+  ctx.beginPath(); ctx.moveTo(midX + 8, dY); ctx.lineTo(boxX + boxW - 40, dY); ctx.stroke();
+  ctx.strokeStyle = '#E8524A'; ctx.globalAlpha = 0.4;
+  ctx.beginPath();
+  ctx.moveTo(midX, dY-5); ctx.lineTo(midX+6, dY); ctx.lineTo(midX, dY+5); ctx.lineTo(midX-6, dY);
+  ctx.closePath(); ctx.stroke();
+  ctx.globalAlpha = 1;
+
+  ctx.font = '400 18px sans-serif'; ctx.fillStyle = '#5C3D2E'; ctx.textAlign = 'center';
+  lines.forEach((l, i) => ctx.fillText(l, W/2, boxY + 42 + i * lH));
+
+  const footY = boxY + boxH + 20;
+  ctx.strokeStyle = '#EDE0D4'; ctx.lineWidth = 1;
+  ctx.beginPath(); ctx.moveTo(boxX, footY); ctx.lineTo(boxX + boxW, footY); ctx.stroke();
+
+  ctx.font = '20px serif'; ctx.textAlign = 'center';
+  ctx.fillText('\uD83D\uDC3E', W/2, footY + 28);
+
+  ctx.font = '400 16px sans-serif'; ctx.fillStyle = '#B09080';
+  ctx.fillText('cat-mauve-eight.vercel.app', W/2, footY + 50);
+
+  const finalH = footY + 66;
+  const finalCanvas = document.createElement('canvas');
+  finalCanvas.width = W; finalCanvas.height = finalH;
+  finalCanvas.getContext('2d').drawImage(canvas, 0, 0);
 
   const link = document.createElement('a');
   link.download = `喵咪TI_${r.name}.png`;
-  link.href = canvas.toDataURL('image/png');
+  link.href = finalCanvas.toDataURL('image/png');
   link.click();
 }
+
 
 function roundRect(ctx, x, y, w, h, r) {
   ctx.beginPath();
