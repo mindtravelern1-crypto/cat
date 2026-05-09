@@ -1020,7 +1020,7 @@ function downloadCard() {
   const r = results[key] || results['IPT'];
 
   const canvas = document.createElement('canvas');
-  const W = 800, H = 1000;
+  const W = 800, H = 820;
   canvas.width = W;
   canvas.height = H;
   const ctx = canvas.getContext('2d');
@@ -1096,20 +1096,20 @@ function downloadCard() {
   ctx.strokeStyle = '#F0E8E0';
   ctx.lineWidth = 2;
   ctx.beginPath();
-  ctx.moveTo(60, 820);
-  ctx.lineTo(W - 60, 820);
+  ctx.moveTo(60, 690);
+  ctx.lineTo(W - 60, 690);
   ctx.stroke();
 
   // 網址
   ctx.font = '500 24px sans-serif';
   ctx.fillStyle = '#8B6355';
   ctx.textAlign = 'center';
-  ctx.fillText('cat-mauve-eight.vercel.app', W/2, 880);
+  ctx.fillText('cat-mauve-eight.vercel.app', W/2, 750);
 
   // 貓掌裝飾
   ctx.font = '30px serif';
-  ctx.fillText('🐾', 100, 900);
-  ctx.fillText('🐾', W - 100, 900);
+  ctx.fillText('🐾', 100, 770);
+  ctx.fillText('🐾', W - 100, 770);
 
   // 下載
   const link = document.createElement('a');
