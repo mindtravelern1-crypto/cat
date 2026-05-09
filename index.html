@@ -1005,9 +1005,11 @@ function showResult() {
             <button class="btn-coupon-copy" onclick="copyAndGo()">複製優惠碼並前往官網 →</button>
           </div>
         </div>
-        <button class="btn-download" onclick="downloadCard()">下載結果圖片 ↓</button>
-        <button class="btn-share" onclick="shareResult('${r.name}', '${r.breed}')">分享給朋友 🐾</button>
+        <button class="btn-share" onclick="downloadCard()">下載結果圖片 ↓</button>
         <br><br>
+        <div style="text-align:center;margin-top:8px;margin-bottom:16px">
+          <a href="https://cat-mauve-eight.vercel.app" target="_blank" style="font-size:12px;color:var(--brown-light);text-decoration:underline;opacity:0.7">cat-mauve-eight.vercel.app</a>
+        </div>
         <button class="btn-retry" onclick="retryQuiz()">再測一次</button>
       </div>
     </div>
