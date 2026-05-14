@@ -5,6 +5,14 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>喵咪TI</title>
 <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;500;700;900&display=swap" rel="stylesheet">
+<!-- Google tag (gtag.js) -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-M712VCGJHV"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+  gtag('config', 'G-M712VCGJHV');
+</script>
 <style>
   :root {
     --coral: #E8524A;
@@ -862,6 +870,7 @@ let history = [];
 let currentResultKey = '';
 
 function startQuiz() {
+  gtag('event', 'quiz_start');
   document.getElementById('splash').style.display = 'none';
   document.getElementById('quiz').style.display = 'block';
   renderQuestion();
@@ -947,6 +956,7 @@ function showResult() {
   const vibe   = scores.A > scores.T ? 'A' : scores.T > scores.A ? 'T' : (Math.random() > 0.5 ? 'A' : 'T');
   const key = social + exec + vibe;
   currentResultKey = key;
+  gtag('event', 'quiz_complete', { result: key });
   const r = results[key] || results['IPT'];
 
   document.getElementById('quiz').style.display = 'none';
@@ -1025,6 +1035,7 @@ function showResult() {
 }
 
 function downloadCard() {
+  gtag('event', 'download_card', { result: currentResultKey });
   const key = currentResultKey || 'IPT';
   const r = results[key] || results['IPT'];
 
@@ -1213,6 +1224,7 @@ function wrapText(ctx, text, x, y, maxW, lineH) {
 }
 
 function copyAndGo() {
+  gtag('event', 'coupon_click');
   const code = document.getElementById('couponCode')?.textContent || 'CATCODE';
   const btn = document.querySelector('.btn-coupon-copy');
   navigator.clipboard.writeText(code).then(() => {
@@ -1242,6 +1254,7 @@ function copyCoupon() {
 }
 
 function shareResult(name, breed) {
+  gtag('event', 'share_click', { result: currentResultKey });
   const text = `我做了喵咪TI測驗，結果是「${name}」（${breed}）🐾\n你是哪種貓？`;
   const url = window.location.href;
   const full = text + '\n' + url;
