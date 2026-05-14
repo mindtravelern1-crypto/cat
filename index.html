@@ -1164,7 +1164,7 @@ function drawCard(r, catImg) {
     finalCanvas.toBlob(blob => {
       const url = URL.createObjectURL(blob);
       const link = document.createElement('a');
-      link.download = \`喵咪TI_\${r.name}.png\`;
+      link.download = `喵咪TI_${r.name}.png`;
       link.href = url;
       document.body.appendChild(link);
       link.click();
