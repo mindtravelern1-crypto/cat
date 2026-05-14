@@ -1144,7 +1144,7 @@ function drawCard(r, catImg) {
   ctx.font = '400 18px sans-serif'; ctx.fillStyle = '#5C3D2E'; ctx.textAlign = 'center';
   lines.forEach((l, i) => ctx.fillText(l, W/2, boxY + 42 + i * lH));
 
-  const footY = boxY + boxH + 20;
+  const footY = boxY + boxH + 40;
   ctx.strokeStyle = '#EDE0D4'; ctx.lineWidth = 1;
   ctx.beginPath(); ctx.moveTo(boxX, footY); ctx.lineTo(boxX + boxW, footY); ctx.stroke();
 
