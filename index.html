@@ -1148,33 +1148,37 @@ function drawCard(r, catImg) {
   ctx.strokeStyle = '#EDE0D4'; ctx.lineWidth = 1;
   ctx.beginPath(); ctx.moveTo(boxX, footY); ctx.lineTo(boxX + boxW, footY); ctx.stroke();
 
+  const footContentY = footY + 34;
   ctx.font = '20px serif'; ctx.textAlign = 'center';
-  ctx.fillText('\uD83D\uDC3E', W/2, footY + 28);
+  ctx.fillText('\uD83D\uDC3E', W/2, footContentY);
 
   ctx.font = '400 16px sans-serif'; ctx.fillStyle = '#B09080';
-  ctx.fillText('cat-mauve-eight.vercel.app', W/2, footY + 50);
+  ctx.fillText('cat-mauve-eight.vercel.app', W/2, footContentY + 26);
 
   const finalH = footY + 66;
   const finalCanvas = document.createElement('canvas');
   finalCanvas.width = W; finalCanvas.height = finalH;
   finalCanvas.getContext('2d').drawImage(canvas, 0, 0);
 
-  // 手機和電腦都能用
-  try {
-    finalCanvas.toBlob(blob => {
-      const url = URL.createObjectURL(blob);
-      const link = document.createElement('a');
-      link.download = `喵咪TI_${r.name}.png`;
-      link.href = url;
-      document.body.appendChild(link);
-      link.click();
-      document.body.removeChild(link);
-      setTimeout(() => URL.revokeObjectURL(url), 1000);
-    }, 'image/png');
-  } catch(e) {
-    // fallback: 開新視窗讓用戶手動儲存
-    const url = finalCanvas.toDataURL('image/png');
-    window.open(url, '_blank');
+  const dataUrl = finalCanvas.toDataURL('image/png');
+
+  // iOS Safari 無法用 a.click() 下載，改成開新視窗讓用戶長按儲存
+  const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent);
+  if (isIOS) {
+    const win = window.open('', '_blank');
+    win.document.write(`
+      <html><head><meta name="viewport" content="width=device-width">
+      <style>body{margin:0;background:#000;display:flex;flex-direction:column;align-items:center;justify-content:center;min-height:100vh;}
+      img{max-width:100%;} p{color:white;font-size:16px;margin:16px;text-align:center;font-family:sans-serif;}</style></head>
+      <body><p>長按圖片儲存到相簿</p><img src="${dataUrl}"></body></html>
+    `);
+  } else {
+    const link = document.createElement('a');
+    link.download = \`喵咪TI_\${r.name}.png\`;
+    link.href = dataUrl;
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
   }
 }
 
