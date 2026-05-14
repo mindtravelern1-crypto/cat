@@ -1020,6 +1020,19 @@ function downloadCard() {
               (scores.J > scores.P ? 'J' : 'P') +
               (scores.A > scores.T ? 'A' : 'T');
   const r = results[key] || results['IPT'];
+
+  if (r.img) {
+    const img = new Image();
+    img.crossOrigin = 'anonymous';
+    img.onload = () => drawCard(r, img);
+    img.onerror = () => drawCard(r, null);
+    img.src = r.img;
+  } else {
+    drawCard(r, null);
+  }
+}
+
+function drawCard(r, catImg) {
   const W = 600;
   const canvas = document.createElement('canvas');
   canvas.width = W; canvas.height = 900;
@@ -1032,8 +1045,15 @@ function downloadCard() {
   ctx.fillStyle = '#E8524A';
   ctx.fillRect(0, 0, W, redH);
 
-  ctx.font = '86px serif'; ctx.textAlign = 'center';
-  ctx.fillText(r.emoji, W/2, 96);
+  // 貓咪圖片或emoji
+  if (catImg) {
+    const imgSize = 200;
+    const imgX = (W - imgSize) / 2;
+    ctx.drawImage(catImg, imgX, 20, imgSize, imgSize);
+  } else {
+    ctx.font = '86px serif'; ctx.textAlign = 'center';
+    ctx.fillText(r.emoji, W/2, 96);
+  }
 
   ctx.font = '400 17px sans-serif'; ctx.fillStyle = 'rgba(255,255,255,0.75)';
   ctx.fillText('你是', W/2, 130);
