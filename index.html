@@ -858,7 +858,8 @@ const results = {
 let scores = { E:0, I:0, J:0, P:0, A:0, T:0 };
 let currentQ = 0;
 let locked = false;
-let history = []; // { value, scoreDelta }
+let history = [];
+let currentResultKey = '';
 
 function startQuiz() {
   document.getElementById('splash').style.display = 'none';
@@ -945,6 +946,7 @@ function showResult() {
   const exec   = scores.J > scores.P ? 'J' : scores.P > scores.J ? 'P' : (Math.random() > 0.5 ? 'J' : 'P');
   const vibe   = scores.A > scores.T ? 'A' : scores.T > scores.A ? 'T' : (Math.random() > 0.5 ? 'A' : 'T');
   const key = social + exec + vibe;
+  currentResultKey = key;
   const r = results[key] || results['IPT'];
 
   document.getElementById('quiz').style.display = 'none';
@@ -1023,9 +1025,7 @@ function showResult() {
 }
 
 function downloadCard() {
-  const key = (scores.E > scores.I ? 'E' : 'I') +
-              (scores.J > scores.P ? 'J' : 'P') +
-              (scores.A > scores.T ? 'A' : 'T');
+  const key = currentResultKey || 'IPT';
   const r = results[key] || results['IPT'];
 
   if (r.img) {
@@ -1299,6 +1299,7 @@ function retryQuiz() {
   currentQ = 0;
   locked = false;
   history = [];
+  currentResultKey = '';
   document.getElementById('result').style.display = 'none';
   document.getElementById('quiz').style.display = 'block';
   renderQuestion();
