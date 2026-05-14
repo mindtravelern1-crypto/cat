@@ -947,7 +947,7 @@ function showResult() {
   el.innerHTML = `
     <div class="screen">
       <div class="result-header">
-        <span class="result-cat-emoji">${r.img ? `<img src="${r.img}" style="width:200px;height:200px;object-fit:contain" onerror="this.style.display='none';this.nextSibling.style.display='block'"><span style="display:none;font-size:80px">${r.emoji}</span>` : `<span style="font-size:80px">${r.emoji}</span>`}</span>
+        <span class="result-cat-emoji">${r.img ? `<img src="${r.img}" style="width:min(260px,70vw);height:min(260px,70vw);object-fit:contain" onerror="this.style.display='none';this.nextSibling.style.display='block'"><span style="display:none;font-size:80px">${r.emoji}</span>` : `<span style="font-size:80px">${r.emoji}</span>`}</span>
         <div class="result-type-label">你是</div>
         <div class="result-name">${r.name}</div>
         <div class="result-breed">${r.breed}</div>
