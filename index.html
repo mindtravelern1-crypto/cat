@@ -1254,7 +1254,6 @@ function copyCoupon() {
 }
 
 function shareResult(name, breed) {
-  gtag('event', 'share_click', { result: currentResultKey });
   const text = `我做了喵咪TI測驗，結果是「${name}」（${breed}）🐾\n你是哪種貓？`;
   const url = window.location.href;
   const full = text + '\n' + url;
@@ -1308,6 +1307,7 @@ function doCopy(btn) {
 }
 
 function retryQuiz() {
+  gtag('event', 'retry_quiz', { result: currentResultKey });
   scores = { E:0, I:0, J:0, P:0, A:0, T:0 };
   currentQ = 0;
   locked = false;
