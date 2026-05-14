@@ -1048,28 +1048,30 @@ function drawCard(r, catImg) {
   ctx.fillStyle = '#FDF6F0';
   ctx.fillRect(0, 0, W, 900);
 
-  const redH = 280;
+  const redH = 420;
   ctx.fillStyle = '#E8524A';
   ctx.fillRect(0, 0, W, redH);
 
-  // 貓咪圖片或emoji
+  ctx.textAlign = 'center';
+
   if (catImg) {
-    const imgSize = 200;
+    const imgSize = 220;
     const imgX = (W - imgSize) / 2;
-    ctx.drawImage(catImg, imgX, 20, imgSize, imgSize);
+    ctx.drawImage(catImg, imgX, 10, imgSize, imgSize);
   } else {
-    ctx.font = '86px serif'; ctx.textAlign = 'center';
-    ctx.fillText(r.emoji, W/2, 96);
+    ctx.font = '86px serif';
+    ctx.fillStyle = 'white';
+    ctx.fillText(r.emoji, W/2, 100);
   }
 
   ctx.font = '400 17px sans-serif'; ctx.fillStyle = 'rgba(255,255,255,0.75)';
-  ctx.fillText('你是', W/2, 130);
+  ctx.fillText('你是', W/2, 248);
 
   ctx.font = '900 50px sans-serif'; ctx.fillStyle = '#FFFFFF';
-  ctx.fillText(r.name, W/2, 190);
+  ctx.fillText(r.name, W/2, 305);
 
   ctx.font = '400 20px sans-serif'; ctx.fillStyle = 'rgba(255,255,255,0.8)';
-  ctx.fillText(r.breed, W/2, 224);
+  ctx.fillText(r.breed, W/2, 338);
 
   ctx.font = '700 15px sans-serif';
   const bPad = 11, bH = 26, bGap = 7;
@@ -1079,11 +1081,11 @@ function drawCard(r, catImg) {
   r.dims.forEach((dim, i) => {
     const bw = bWidths[i];
     ctx.fillStyle = 'rgba(255,255,255,0.2)';
-    roundRect(ctx, bx, 246, bw, bH, 13); ctx.fill();
+    roundRect(ctx, bx, 358, bw, bH, 13); ctx.fill();
     ctx.strokeStyle = 'rgba(255,255,255,0.35)'; ctx.lineWidth = 1;
-    roundRect(ctx, bx, 246, bw, bH, 13); ctx.stroke();
+    roundRect(ctx, bx, 358, bw, bH, 13); ctx.stroke();
     ctx.fillStyle = 'rgba(255,255,255,0.9)'; ctx.textAlign = 'left';
-    ctx.fillText(dim, bx + bPad, 263);
+    ctx.fillText(dim, bx + bPad, 375);
     bx += bw + bGap;
   });
 
@@ -1157,17 +1159,23 @@ function drawCard(r, catImg) {
   finalCanvas.width = W; finalCanvas.height = finalH;
   finalCanvas.getContext('2d').drawImage(canvas, 0, 0);
 
-  // 手機和電腦都能用的下載方式
-  finalCanvas.toBlob(blob => {
-    const url = URL.createObjectURL(blob);
-    const link = document.createElement('a');
-    link.download = `喵咪TI_${r.name}.png`;
-    link.href = url;
-    document.body.appendChild(link);
-    link.click();
-    document.body.removeChild(link);
-    setTimeout(() => URL.revokeObjectURL(url), 1000);
-  }, 'image/png');
+  // 手機和電腦都能用
+  try {
+    finalCanvas.toBlob(blob => {
+      const url = URL.createObjectURL(blob);
+      const link = document.createElement('a');
+      link.download = \`喵咪TI_\${r.name}.png\`;
+      link.href = url;
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+      setTimeout(() => URL.revokeObjectURL(url), 1000);
+    }, 'image/png');
+  } catch(e) {
+    // fallback: 開新視窗讓用戶手動儲存
+    const url = finalCanvas.toDataURL('image/png');
+    window.open(url, '_blank');
+  }
 }
 
 
