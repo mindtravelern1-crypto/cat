@@ -253,6 +253,13 @@
     background: #FFF8F5;
   }
 
+  @media (hover: none) {
+    .option-btn:hover {
+      border-color: transparent;
+      background: white;
+    }
+  }
+
   @keyframes pawTap {
     0% { transform: translateY(-50%) scale(1); }
     30% { transform: translateY(-50%) scale(1.5) rotate(25deg); }
@@ -1150,10 +1157,17 @@ function drawCard(r, catImg) {
   finalCanvas.width = W; finalCanvas.height = finalH;
   finalCanvas.getContext('2d').drawImage(canvas, 0, 0);
 
-  const link = document.createElement('a');
-  link.download = `喵咪TI_${r.name}.png`;
-  link.href = finalCanvas.toDataURL('image/png');
-  link.click();
+  // 手機和電腦都能用的下載方式
+  finalCanvas.toBlob(blob => {
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement('a');
+    link.download = `喵咪TI_${r.name}.png`;
+    link.href = url;
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    setTimeout(() => URL.revokeObjectURL(url), 1000);
+  }, 'image/png');
 }
 
 
