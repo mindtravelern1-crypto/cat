@@ -1055,7 +1055,7 @@ function drawCard(r, catImg) {
   ctx.textAlign = 'center';
 
   if (catImg) {
-    const imgSize = 220;
+    const imgSize = 260;
     const imgX = (W - imgSize) / 2;
     ctx.drawImage(catImg, imgX, 10, imgSize, imgSize);
   } else {
@@ -1067,7 +1067,7 @@ function drawCard(r, catImg) {
   ctx.font = '400 17px sans-serif'; ctx.fillStyle = 'rgba(255,255,255,0.75)';
   ctx.fillText('你是', W/2, 248);
 
-  ctx.font = '900 50px sans-serif'; ctx.fillStyle = '#FFFFFF';
+  ctx.font = '900 40px sans-serif'; ctx.fillStyle = '#FFFFFF';
   ctx.fillText(r.name, W/2, 305);
 
   ctx.font = '400 20px sans-serif'; ctx.fillStyle = 'rgba(255,255,255,0.8)';
@@ -1148,14 +1148,13 @@ function drawCard(r, catImg) {
   ctx.strokeStyle = '#EDE0D4'; ctx.lineWidth = 1;
   ctx.beginPath(); ctx.moveTo(boxX, footY); ctx.lineTo(boxX + boxW, footY); ctx.stroke();
 
-  const footContentY = footY + 34;
+  const finalH = footY + 80;
+  const footMidY = footY + 40;
   ctx.font = '20px serif'; ctx.textAlign = 'center';
-  ctx.fillText('\uD83D\uDC3E', W/2, footContentY);
-
+  ctx.fillText('\uD83D\uDC3E', W/2, footMidY - 8);
   ctx.font = '400 16px sans-serif'; ctx.fillStyle = '#B09080';
-  ctx.fillText('cat-mauve-eight.vercel.app', W/2, footContentY + 26);
+  ctx.fillText('cat-mauve-eight.vercel.app', W/2, footMidY + 18);
 
-  const finalH = footY + 66;
   const finalCanvas = document.createElement('canvas');
   finalCanvas.width = W; finalCanvas.height = finalH;
   finalCanvas.getContext('2d').drawImage(canvas, 0, 0);
