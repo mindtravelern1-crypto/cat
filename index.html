@@ -1172,7 +1172,9 @@ function drawCard(r, catImg) {
   const dataUrl = finalCanvas.toDataURL('image/png');
 
   const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent);
-  if (isIOS) {
+  const isLineAndroid = /Android/.test(navigator.userAgent) && /Line\//.test(navigator.userAgent);
+
+  if (isIOS || isLineAndroid) {
     const overlay = document.createElement('div');
     overlay.style.cssText = 'position:fixed;inset:0;background:rgba(0,0,0,0.85);z-index:9999;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:20px';
     overlay.innerHTML = `
