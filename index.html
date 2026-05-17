@@ -666,7 +666,7 @@
 <body>
 
 <div id="splash" class="screen">
-  <div class="splash-cat">🐱</div>
+  <img src="https://res.cloudinary.com/dtnclzajp/image/upload/v1779029541/%E5%AB%8C%E7%96%91%E8%B2%93%E8%B2%93_sqgyth.png" style="width:160px;height:160px;object-fit:contain">
   <div class="splash-badge">人格測驗</div>
   <h1 class="splash-title">喵咪<span>TI</span></h1>
   <p class="splash-sub">7 道題，找出你到底是哪種貓的靈魂附體</p>
@@ -1172,9 +1172,7 @@ function drawCard(r, catImg) {
   const dataUrl = finalCanvas.toDataURL('image/png');
 
   const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent);
-  const isLineAndroid = /Android/.test(navigator.userAgent) && /Line\//.test(navigator.userAgent);
-
-  if (isIOS || isLineAndroid) {
+  if (isIOS) {
     const overlay = document.createElement('div');
     overlay.style.cssText = 'position:fixed;inset:0;background:rgba(0,0,0,0.85);z-index:9999;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:20px';
     overlay.innerHTML = `
