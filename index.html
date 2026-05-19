@@ -401,8 +401,15 @@
   .coupon-hint {
     font-size: 11px;
     color: var(--brown-light);
-    margin-bottom: 16px;
+    margin-bottom: 12px;
     opacity: 0.8;
+  }
+
+  .coupon-note {
+    font-size: 10px;
+    color: var(--brown-light);
+    opacity: 0.7;
+    margin-top: 10px;
   }
 
   .btn-coupon-copy {
@@ -1019,12 +1026,14 @@ function showResult() {
           </div>
         </div>
         <div class="coupon-card">
-          <div class="coupon-label">🐾 喵咪TI 專屬優惠</div>
-          <div class="coupon-code" id="couponCode">CATCODE</div>
-          <div class="coupon-hint">📸 截圖存著，主子在等你伺候呢</div>
+          <div class="coupon-label">🐾 喵咪TI 專屬優惠・每件折 $100</div>
+          <div class="coupon-code" id="couponCode">NTUlovecat</div>
+          <div class="coupon-sub">適用：豆腐砂／礦砂／貓肥家潤禮盒・至 6/5 止</div>
+          <div class="coupon-hint">📸 先截圖存優惠碼，結帳時輸入 NTUlovecat</div>
           <div class="coupon-btns">
-            <button class="btn-coupon-copy" onclick="copyAndGo()">複製優惠碼並前往官網 →</button>
+            <button class="btn-coupon-copy" onclick="goShop()">前往愛貓一生官網 →</button>
           </div>
+          <div class="coupon-note">點連結折扣自動套用，或結帳時手動輸入優惠碼</div>
         </div>
         <button class="btn-share" onclick="downloadCard()">下載結果圖片 ↓</button>
         <br><br>
@@ -1223,19 +1232,13 @@ function wrapText(ctx, text, x, y, maxW, lineH) {
   ctx.fillText(line, x, cy);
 }
 
-function copyAndGo() {
+function goShop() {
   gtag('event', 'coupon_click');
-  const code = document.getElementById('couponCode')?.textContent || 'CATCODE';
-  const btn = document.querySelector('.btn-coupon-copy');
-  navigator.clipboard.writeText(code).then(() => {
-    btn.textContent = '已複製 ✓ 前往官網中...';
-    btn.style.background = '#4CAF50';
-    setTimeout(() => {
-      window.open('https://catinlove.com/collections/cat-wet-food', '_blank');
-    }, 800);
-  }).catch(() => {
-    window.open('https://catinlove.com/collections/cat-wet-food', '_blank');
-  });
+  window.open('https://catinlove.com/discount/NTUlovecat', '_blank');
+}
+
+function copyAndGo() {
+  goShop();
 }
 
 function copyCoupon() {
